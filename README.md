@@ -83,4 +83,7 @@ We could use an Embedded Relationship as shown.
 
 * **Israel Santiago** - *An assessment for Clip* 
 
+## NOTE
+
+* **Still miss the Javadoc comments in project**
 
