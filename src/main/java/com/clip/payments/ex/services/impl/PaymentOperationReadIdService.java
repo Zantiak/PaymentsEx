@@ -11,8 +11,10 @@ import com.clip.payments.ex.services.PaymentOperationsService;
 
 public class PaymentOperationReadIdService implements PaymentOperationsService {
 
+	
+	
 	public PaymentUser executeOperation(PaymentUser paymentUser) throws PaymentOperationException {
-
+		
 		PaymentUserDAO paymentUserDAO = new PaymentUserDAOImpl();
 		PaymentUser paymentUserRet = new PaymentUser();
 		Payment payment = null;

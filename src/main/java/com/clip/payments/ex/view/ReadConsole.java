@@ -5,10 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.net.URLDecoder;
-
-import org.apache.commons.io.FileUtils;
 
 import com.clip.payments.ex.dtos.PaymentUser;
 import com.clip.payments.ex.exceptions.PaymentOperationException;
@@ -16,19 +12,22 @@ import com.clip.payments.ex.exceptions.ValidationException;
 import com.clip.payments.ex.generalhelpers.ConversionHelper;
 import com.clip.payments.ex.generalhelpers.impl.ConversionHelperImpl;
 import com.clip.payments.ex.services.PaymentOperationsDelegate;
+import com.clip.payments.ex.utils.Util;
 
 public class ReadConsole {
+	
+	private static String FILE_SEPARATOR = System.getProperty("file.separator");
+	private static String BD_DIR_NAME = "ClipPayments_DB";
 
 	public static void main(String[] args) throws IOException {
 		ReadConsole rc = new ReadConsole();
 		
 		//Create data directory
 		rc.createDataDirectory();
-		//At the start load the data
-		rc.loadData();
 		rc.readInput(new InputStreamReader(System.in));				
-
 	}
+	
+	
 	
 	public void readInput(InputStreamReader systemIn) {
 		try {
@@ -42,14 +41,12 @@ public class ReadConsole {
 				try {
 					sInput = br.readLine().trim();
 					exitFlag = !sInput.equals(ViewConstants.EXIT_KEY);
-//					System.out.println(cin.getEncoding());
 					if(null == sInput || sInput.equalsIgnoreCase(ViewConstants.EMPTY_ENTRY)) {
 						System.out.println("No input where received");
 						System.out.print(ViewConstants.APP_ENTRY);
 					} else if (exitFlag) {
-						//Here goes the magic, convert the entry and inside the convertion validate the entry
+						//Here goes the magic, convert the entry and inside the conversion validate the entry
 						callOperations(sInput);
-//						System.out.println(sInput);
 						System.out.print(ViewConstants.APP_ENTRY);
 					} else {
 						System.out.println("Seeeeya");
@@ -87,42 +84,16 @@ public class ReadConsole {
 				pc.printSum(paymentUser);
 				break;
 		}
-				
 	}
 	
+	
+	
 	private void createDataDirectory() throws UnsupportedEncodingException {		
-		String path = getPath();
-
-		String fileSeparator = System.getProperty("file.separator");
-		String newDir = path + fileSeparator + "ClipPayments_DB" + fileSeparator;
-//		JOptionPane.showMessageDialog(null, newDir);// TODO remove this line
+		String path = Util.getPath();
+		String newDir = path + FILE_SEPARATOR + BD_DIR_NAME + FILE_SEPARATOR;
 
 		File file = new File(newDir);
 		file.mkdir();
-	}
-	
-	private void loadData() throws UnsupportedEncodingException {
-		//move data in resources folder to application folder
-		String path = getPath();
-		String fileSeparator = System.getProperty("file.separator");
-		
-		ClassLoader classLoader = getClass().getClassLoader();
-		
-		File source = new File(classLoader.getResource("ClipPayments_DB").getPath());
-		File dest = new File(path + fileSeparator + "ClipPayments_DB" + fileSeparator);
-		try {
-		    FileUtils.copyDirectory(source, dest);
-		} catch (IOException e) {
-		    e.printStackTrace();
-		}
-	}
-	
-	public static String getPath() throws UnsupportedEncodingException {
-		URL url = ReadConsole.class.getProtectionDomain().getCodeSource().getLocation();
-		String jarPath = URLDecoder.decode(url.getFile(), "UTF-8");
-		String parentPath = new File(jarPath).getParentFile().getPath();
-//		String parentPath2 = new File(parentPath).getParentFile().getPath();
-		return parentPath;
 	}
 	
 }

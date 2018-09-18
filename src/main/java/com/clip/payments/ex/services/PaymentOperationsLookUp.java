@@ -9,6 +9,8 @@ import com.clip.payments.ex.services.impl.PaymentOperationSumService;
 
 public class PaymentOperationsLookUp {
 	
+	
+	
 	public PaymentOperationsService getOperationService(OperationsEnum operationEnum) throws PaymentOperationException {
 		
 		switch(operationEnum) {

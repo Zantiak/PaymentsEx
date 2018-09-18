@@ -14,6 +14,8 @@ import com.clip.payments.ex.utils.DateComparator;
 
 public class PaymentOperationListService implements PaymentOperationsService {
 
+	
+	
 	public PaymentUser executeOperation(PaymentUser paymentUser) throws PaymentOperationException {
 
 		PaymentUserDAO paymentUserDAO = new PaymentUserDAOImpl();

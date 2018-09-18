@@ -8,9 +8,13 @@ public class DateUtil {
 	
 	public static SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
 	
+	
+	
     public static Date stringToDate(String operationDate) throws ParseException {
     	return SDF.parse(operationDate);
     }
+    
+    
     
     public static String dateToString(Date date) throws ParseException {
     	return SDF.format(date);

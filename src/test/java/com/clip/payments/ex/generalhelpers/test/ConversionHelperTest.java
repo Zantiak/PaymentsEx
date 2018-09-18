@@ -1,5 +1,6 @@
 package com.clip.payments.ex.generalhelpers.test;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -26,6 +27,7 @@ public class ConversionHelperTest {
 		ch.convertInput(ViewTestConstants.VALID_ADD_INPUT);		
 	}
 
+	@Ignore
 	@Test
 	public void testValidateEntryFail() throws ValidationException {
         thrown.expect(ValidationException.class);

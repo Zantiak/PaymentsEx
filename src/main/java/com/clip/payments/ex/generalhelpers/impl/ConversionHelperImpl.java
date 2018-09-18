@@ -8,6 +8,7 @@ import com.clip.payments.ex.dtos.PaymentUser;
 import com.clip.payments.ex.enums.OperationsEnum;
 import com.clip.payments.ex.exceptions.ValidationException;
 import com.clip.payments.ex.generalhelpers.ConversionHelper;
+import com.clip.payments.ex.utils.Constants;
 import com.clip.payments.ex.utils.DateUtil;
 import com.clip.payments.ex.view.helper.ValidationHelper;
 import com.clip.payments.ex.view.helper.impl.ValidationHelperImpl;
@@ -17,7 +18,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
 public class ConversionHelperImpl implements ConversionHelper{
+	
+	private final static String OPEN_CURLY_BRACKET = "{";
 
+	
+	
 	public PaymentUser convertInput(String sInput) throws ValidationException {
 		final ValidationHelper vHelper = new ValidationHelperImpl();								
 		//needed variables
@@ -30,9 +35,9 @@ public class ConversionHelperImpl implements ConversionHelper{
 		OperationsEnum operation;
 		
 		try {
-			if (vHelper.validateEntry(sInput) && sInput.contains("{")) {//contains json
-				jsonStr = sInput.substring(sInput.indexOf("{"), sInput.length());
-				userOpLastIndex = sInput.indexOf("{");
+			if (vHelper.validateEntry(sInput) && sInput.contains(OPEN_CURLY_BRACKET)) {//contains json
+				jsonStr = sInput.substring(sInput.indexOf(OPEN_CURLY_BRACKET), sInput.length());
+				userOpLastIndex = sInput.indexOf(OPEN_CURLY_BRACKET);
 				//set this json, just if it is an add operation
 				payment = convertPayment(vHelper.validateJSON(jsonStr));
 			} else {//correct length
@@ -41,8 +46,8 @@ public class ConversionHelperImpl implements ConversionHelper{
 			
 			//separate user from operation
 			userOp = sInput.substring(0, userOpLastIndex);
-			userId = userOp.substring(0, userOp.indexOf(" ")).trim();
-			op = userOp.substring(userOp.indexOf(" ")).trim();
+			userId = userOp.substring(0, userOp.indexOf(Constants.CHAR_SPACE)).trim();
+			op = userOp.substring(userOp.indexOf(Constants.CHAR_SPACE)).trim();
 			if(userId.length() < 1 || !vHelper.isNumericAndNotZero(userId) || op.length() < 1) {//validate usr and op length								
 				throw new ValidationException();
 			}

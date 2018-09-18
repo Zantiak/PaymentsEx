@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public class Payment {
 	
+	
 	public Payment(BigDecimal amount, String description, Date date, UUID transaction_id, String userId){
 		this.amount = amount;
 		this.description = description;
@@ -17,11 +18,14 @@ public class Payment {
 	public Payment(){
 	}
 	
+	
 	private UUID transaction_id;
 	private BigDecimal amount;
 	private String description;
 	private Date date;
 	private String userId;
+	
+	
 	
 	public BigDecimal getAmount() {
 		return amount;

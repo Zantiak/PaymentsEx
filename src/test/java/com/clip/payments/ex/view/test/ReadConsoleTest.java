@@ -41,11 +41,8 @@ public class ReadConsoleTest {
         
         rc.readInput(isr);
 
-        assertEquals("./application hello\n" + 
+        assertEquals("./application Incorrect parameters!\n" + 
         		"./application Seeeeya\n", outContent.toString().substring(33));
-
-//        assertEquals("./application Seeeeya\n" + 
-//        		"", outContent.toString().substring(33));
 	}
 	
 	@Test
@@ -61,19 +58,5 @@ public class ReadConsoleTest {
         assertEquals("./application No input where received\n" + 
         		"./application Seeeeya\n", outContent.toString().substring(33));
 	}
-	
-//	@Test
-//	public void testReadInputNull() throws IOException {
-//		ReadConsole rc = new ReadConsole();
-//        byte[] data = "\nq".getBytes();
-//        
-//        InputStream input = new ByteArrayInputStream(data);
-//        InputStreamReader isr = null;
-//        
-//        rc.readInput(isr);
-//
-//        assertEquals("./application No input where received\n" + 
-//        		"./application Seeeeya\n", outContent.toString().substring(33));
-//	}
 
 }

@@ -14,6 +14,8 @@ import com.clip.payments.ex.services.PaymentOperationsService;
 
 public class PaymentOperationSumService implements PaymentOperationsService {
 
+	
+	
 	public PaymentUser executeOperation(PaymentUser paymentUser) throws PaymentOperationException {
 
 		PaymentUserDAO paymentUserDAO = new PaymentUserDAOImpl();

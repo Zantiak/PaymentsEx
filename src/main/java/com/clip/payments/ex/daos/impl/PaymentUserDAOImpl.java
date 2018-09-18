@@ -18,25 +18,29 @@ import com.clip.payments.ex.daos.PaymentUserDAO;
 import com.clip.payments.ex.dtos.Payment;
 import com.clip.payments.ex.dtos.PaymentUser;
 import com.clip.payments.ex.exceptions.PaymentUserDAOException;
+import com.clip.payments.ex.utils.Constants;
 import com.clip.payments.ex.utils.DateUtil;
-import com.clip.payments.ex.view.ReadConsole;
+import com.clip.payments.ex.utils.Util;
 
 public class PaymentUserDAOImpl implements PaymentUserDAO {
 
+	private static String FILE_SEPARATOR = System.getProperty("file.separator");
+	private static String BD_DIR_NAME = "ClipPayments_DB";
+	private static String PIPE_CHAR = "|";
+	private static String ESCAPE_PIPE_CHAR = "\\|";
+	private static String NEW_LINE = "\r\n";
+	private static String TXT_FILE_EXTENSION = ".txt";
+	
 	
 	
 	public void addPayment(final PaymentUser paymentUser) throws PaymentUserDAOException {
 		
 		try {
-			String path = ReadConsole.getPath();
-			String fileSeparator = System.getProperty("file.separator");
-			String userFilePath = path + fileSeparator + "ClipPayments_DB" + fileSeparator + paymentUser.getUserId() + ".txt";
-			
-			File userFile = new File(userFilePath);
+			File userFile = getUserFile (paymentUser.getUserId());
 			// if user file doesn't exist, throw an exception
 			if (!userFile.exists()) {
 				if (userFile.createNewFile()) {
-					System.out.println("New user file created: " + userFilePath);
+					System.out.println("New user file created: " + userFile.getAbsolutePath());
 				}
 			}
 			String line = createRegistry(paymentUser);
@@ -53,17 +57,14 @@ public class PaymentUserDAOImpl implements PaymentUserDAO {
 		
 		Payment payment = null;		
 		try {
-			String path = ReadConsole.getPath();
-			String fileSeparator = System.getProperty("file.separator");
-			String userFilePath = path + fileSeparator + "ClipPayments_DB" + fileSeparator + paymentUser.getUserId() + ".txt";
-			
-			File userFile = new File(userFilePath);
+			File userFile = getUserFile (paymentUser.getUserId());	
 			// if user file doesn't exist, throw an exception
 			if (!userFile.exists()) {
 				throw new PaymentUserDAOException("Transaction not found");
 			} else {
 				//get specific record
-				payment = getRecord(userFilePath, paymentUser.getUserId(), paymentUser.getPayment().getTransaction_id().toString());
+				payment = getRecord(userFile.getAbsolutePath(), paymentUser.getUserId(),
+						paymentUser.getPayment().getTransaction_id().toString());
 				if (null == payment) {
 					throw new PaymentUserDAOException("Transaction not found");
 				}
@@ -81,18 +82,13 @@ public class PaymentUserDAOImpl implements PaymentUserDAO {
 		
 		TreeMap<String, Payment> operationsSet = new TreeMap<String, Payment>();		
 		try {
-			String path = ReadConsole.getPath();
-			String fileSeparator = System.getProperty("file.separator");
-			String userFilePath = path + fileSeparator + "ClipPayments_DB" + fileSeparator + paymentUser.getUserId() + ".txt";
-			
-			File userFile = new File(userFilePath);
-			// if user file doesn't exist, throw an exception
+			File userFile = getUserFile (paymentUser.getUserId());	
 			if (!userFile.exists()) {
+				// if user file doesn't exist, throw an exception
 				throw new PaymentUserDAOException("User doesn't exist");
-			// Do the correspoding operation
 			} else {
 				//get all records
-				operationsSet = getUserRecords(userFilePath, paymentUser.getUserId());
+				operationsSet = getUserRecords(userFile.getAbsolutePath(), paymentUser.getUserId());
 			}
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
@@ -105,8 +101,10 @@ public class PaymentUserDAOImpl implements PaymentUserDAO {
 	
 	private String createRegistry(PaymentUser paymentUser) throws ParseException {
 		StringBuffer sb = new StringBuffer();
-		return sb.append(paymentUser.getPayment().getTransaction_id()).append("|").append(paymentUser.getPayment().getAmount().toPlainString())
-		.append("|").append(paymentUser.getPayment().getDescription()).append("|").append(DateUtil.dateToString(paymentUser.getPayment().getDate())).toString();
+		return sb.append(paymentUser.getPayment().getTransaction_id()).append(PIPE_CHAR)
+				.append(paymentUser.getPayment().getAmount().toPlainString()).append(PIPE_CHAR)
+				.append(paymentUser.getPayment().getDescription()).append(PIPE_CHAR)
+				.append(DateUtil.dateToString(paymentUser.getPayment().getDate())).toString();
 	}
 	
 	
@@ -119,12 +117,10 @@ public class PaymentUserDAOImpl implements PaymentUserDAO {
 		Scanner sc = null;
 		try {
 		    inputStream = new FileInputStream(userFilePath);
-		    sc = new Scanner(inputStream, "UTF-8");
+		    sc = new Scanner(inputStream, Constants.CHAR_ENCODING);
 		    while (sc.hasNextLine()) {
-		        String line = sc.nextLine();		        
-//		        System.out.println(line);
-		        
-				String[] tokens = line.split("\\|");
+		        String line = sc.nextLine();		        		        
+				String[] tokens = line.split(ESCAPE_PIPE_CHAR);
 				operationsSet.put(tokens[0] ,new Payment(new BigDecimal(tokens[1]), tokens[2], 
 						DateUtil.stringToDate(tokens[3]), UUID.fromString(tokens[0]), userId));
 		    }
@@ -152,12 +148,11 @@ public class PaymentUserDAOImpl implements PaymentUserDAO {
 		Payment payment = null;
 		try {
 		    inputStream = new FileInputStream(userFilePath);
-		    sc = new Scanner(inputStream, "UTF-8");
+		    sc = new Scanner(inputStream, Constants.CHAR_ENCODING);
 		    while (sc.hasNextLine()) {
 		        String line = sc.nextLine();		        
-//		        System.out.println(line);
 		        
-				String[] tokens = line.split("\\|");
+				String[] tokens = line.split(ESCAPE_PIPE_CHAR);
 				if(tokens[0].equalsIgnoreCase(transactionId)) {
 					payment = new Payment(new BigDecimal(tokens[1]), tokens[2], 
 							DateUtil.stringToDate(tokens[3]), UUID.fromString(tokens[0]), userId);
@@ -188,13 +183,13 @@ public class PaymentUserDAOImpl implements PaymentUserDAO {
             //Write Content
             writer = new FileWriter(file, true);
 
-        	reverseReader = new ReversedLinesFileReader(file, Charset.forName("UTF-8"));
+        	reverseReader = new ReversedLinesFileReader(file, Charset.forName(Constants.CHAR_ENCODING));
             String lastLine = reverseReader.readLine();
             
-			if (null == lastLine || lastLine.trim().isEmpty() || lastLine.contains("\r\n")) {
+			if (null == lastLine || lastLine.trim().isEmpty() || lastLine.contains(NEW_LINE)) {
 				writer.write(line);
 			} else {
-				writer.write("\r\n");// write new line
+				writer.write(NEW_LINE);// write new line
 				writer.write(line);
 			}            		
         }catch(Exception e){
@@ -207,6 +202,15 @@ public class PaymentUserDAOImpl implements PaymentUserDAO {
         		writer.close();   
         	}
         }
+    }
+    
+    
+    
+    private File getUserFile (String userId) throws UnsupportedEncodingException {
+		String path = Util.getPath();
+		String userFilePath = path + FILE_SEPARATOR + BD_DIR_NAME + FILE_SEPARATOR + userId + TXT_FILE_EXTENSION;
+
+		return new File(userFilePath);
     }
 
 }

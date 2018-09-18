@@ -1,0 +1,6 @@
+com/clip/payments/ex/generalhelpers/test/ConversionHelperTest.class
+com/clip/payments/ex/view/test/ReadConsoleTest.class
+com/clip/payments/ex/view/helper/test/ValidationHelperTest.class
+com/clip/payments/ex/services/test/PaymentOperationsLookUpTest.class
+com/clip/payments/ex/services/test/PaymentOperationsDelegateTest.class
+com/clip/payments/ex/view/ViewTestConstants.class

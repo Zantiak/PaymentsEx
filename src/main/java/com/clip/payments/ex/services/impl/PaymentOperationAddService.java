@@ -13,8 +13,9 @@ import com.clip.payments.ex.services.PaymentOperationsService;
 
 public class PaymentOperationAddService implements PaymentOperationsService {
 
-	public PaymentUser executeOperation(final PaymentUser paymentUser) throws PaymentOperationException {
-		
+	
+	
+	public PaymentUser executeOperation(final PaymentUser paymentUser) throws PaymentOperationException {		
 		PaymentUserDAO paymentUserDAO = new PaymentUserDAOImpl();
 		
 		//generate uuid	
